@@ -15,6 +15,18 @@ const serviceSchema =new mongoose.Schema({
     phone_number:{
         type:String,
         required:false
+    },
+    latitude:{
+        type:String,
+        required:true
+    },
+    longitude:{
+        type:String,
+        required:true
+    },
+    google_link:{
+        type:String,
+        required:true
     }
 });
 

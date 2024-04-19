@@ -10,15 +10,18 @@ services.get('/',async (req,res)=>{
 
 services.post('/', async(req,res) =>{
     try{
-        const {name,address,internet_page,phone_number}=req.body;
-        if(!name || !address || !internet_page || !phone_number){
+        const {name,address,internet_page,phone_number,latitude,longitude,google_link}=req.body;
+        if(!name || !address || !phone_number || !latitude || !longitude || !google_link){
             res.sendStatus(400);
         }
         const service= await createService({
             name,
             address,
             internet_page,
-            phone_number
+            phone_number,
+            latitude,
+            longitude,
+            google_link
         })
         return res.status(200).json(service).end()
     }
