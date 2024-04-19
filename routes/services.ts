@@ -1,16 +1,17 @@
 import { Router } from 'express';
-import {createService} from '../models/service'
+import {createService, getServices} from '../models/service'
 export const services = Router();
 
 services.get('/',async (req,res)=>{
-   res.send("services")
+   const data = await getServices();
+   res.send(data);
 })
 
 
-services.post('/services', async(req,res) =>{
+services.post('/', async(req,res) =>{
     try{
         const {name,address,internet_page,phone_number}=req.body;
-        if(!name || !address || !internet_page || phone_number){
+        if(!name || !address || !internet_page || !phone_number){
             res.sendStatus(400);
         }
         const service= await createService({

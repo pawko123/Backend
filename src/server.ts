@@ -1,12 +1,11 @@
 import 'dotenv/config'
 import express,{Express,Request,Response} from 'express';
 import mongoose from 'mongoose';
-import { services } from '../routes/services';
-import bodyParser from 'body-parser'
+import router from "../routes/"
 
 const app:Express=express();
-app.use(bodyParser.json());
-app.use('/services', services);
+app.use(express.json());
+app.use('/',router());
 
 app.get('/', (req:Request, res:Response) => {
   res.send('GET request to the homepage')
