@@ -33,4 +33,4 @@ const serviceSchema =new mongoose.Schema({
 export const Service = mongoose.model("Service",serviceSchema);
 
 export const getServices = () => Service.find(); 
-export const createService = (values:Record<string,any>) =>new Service(values).save().then((service)=>service.toObject())
+export const createService = (values:Record<string,any>) => new Service(values).save().then((service)=>service.toObject())
