@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import express,{Express,Request,Response} from 'express';
 import mongoose from 'mongoose';
-import router from "../routes/"
+import router from "./routes"
 import cors from "cors"
 
 const app:Express=express();
