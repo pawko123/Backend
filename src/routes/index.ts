@@ -1,7 +1,7 @@
-import {services} from './services';
-import {autorepair} from "./autorepairs"
+import {services} from './services.route';
+import {autorepair} from "./autorepair.route"
 import express from 'express';
-import { maps } from './maps';
+import { maps } from './maps.route';
 
 const router = express.Router();
 

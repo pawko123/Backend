@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import {createService, getServices} from '../models/service'
+import {createService, getServices} from '../models/service.model'
 export const services = Router();
 
 services.get('/',async (req,res)=>{

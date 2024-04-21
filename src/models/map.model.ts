@@ -13,5 +13,6 @@ const mapschema =new mongoose.Schema({
 
 export const Map = mongoose.model("Map",mapschema);
 export const getMap = () => Map.find(); 
+export const getMapbyName = (name:String) => Map.find({TrackName:name})
 export const getUsersMap = (email:String) => Map.find({Creator:email})
 export const createMap = (values:Record<string,any>) => new Map(values).save().then((map)=>map.toObject())

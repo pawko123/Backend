@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import {getAutoRepair,createAutoRepair} from "../models/autorepair"
+import {getAutoRepair,createAutoRepair} from "../models/autorepair.model."
 export const autorepair = Router();
 
 autorepair.get('/',async (req,res)=>{
