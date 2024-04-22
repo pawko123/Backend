@@ -1,0 +1,43 @@
+openapi: 3.0.3
+info:
+  title: Capybara App - aplikacja rowerowa API docs
+  contact:
+    email: capyapp@gmail.com
+    version: 1.0.0
+externalDocs:
+  description: Nasza aplikacja
+  url: http://localhost:8100/Home
+servers:
+  - url: http://localhost:5000
+tags:
+  - name: Maps
+    description: Mapy rowerowe naszej aplikacji
+  - name: Services
+    description: Serwisy Rowerowe
+  - name: Autorepairs
+    description: Punkty Samoobslugi
+components:
+  schemas:
+    Autorepair:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6623c9f246efe62da1750cd3
+        name: 
+          type: string
+          example: Stacja naprawy rowerów
+        address: 
+          type: string
+          example: Stefana Batorego 122, 65-735 Zielona Góra
+        latitude:
+          type: string
+          example: 51.956546957030895
+        longitude:
+          type: string
+          example: 15.496965817127784
+        google_link:
+          type: string
+          example: https://www.google.com/maps/place/Stacja+naprawy+rower%C3%B3w/@51.9557411,15.4902315,15.62z/data=!4m10!1m2!2m1!1sStacja+naprawy+rower%C3%B3w!3m6!1s0x47061387afe62faf:0x9f3d1b469b452e2f!8m2!3d51.9563055!4d15.4970451!15sChdTdGFjamEgbmFwcmF3eSByb3dlcsOzd5IBE2JpY3ljbGVfcmVwYWlyX3Nob3DgAQA!16s%2Fg%2F11kqzwb2j3?hl=pl-PL&entry=ttu
+      xml:
+        name: autorepair
