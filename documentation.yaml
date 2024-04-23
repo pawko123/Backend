@@ -16,6 +16,131 @@ tags:
     description: Serwisy Rowerowe
   - name: Autorepairs
     description: Punkty Samoobslugi
+paths:
+  /autorepair:
+    get:
+      tags:
+        - Autorepairs
+      summary: Wyswietla wszystkie serwisy samoobslugowe
+      operationId: getallautorepairs
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Autorepair'          
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Autorepair'
+    post:
+      tags:
+        - Autorepairs
+      summary: Stworz nowy serwis samoobslugowy
+      operationId: createnewautorepair
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Autorepair'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Autorepair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Autorepair'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Autorepair'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Autorepair'
+        '400':
+          description: Invalid input
+  /services:
+    get:
+      tags:
+        - Services
+      summary: Wyswietla wszystkie serwisy samoobslugowe
+      operationId: getallservices
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'          
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'
+    post:
+      tags:
+        - Services
+      summary: Stworz nowy Serwis Rowerowy
+      operationId: createnewservice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Service'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Service'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Service'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Service'
+        '400':
+          description: Invalid input
+  /maps/{email}:
+    get:
+      tags:
+        - Maps
+      summary: Find maps by their creator email
+      operationId: getmapsbyemail
+      parameters:
+        - name: email
+          in: path
+          description: Email of user whose maps we want
+          required: true
+          schema:
+            type: string
+            example: gamespabloplay@gmail.com
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Map'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Map'
+        '400':
+          description: Invalid email supplied
 components:
   schemas:
     Autorepair:
@@ -41,3 +166,73 @@ components:
           example: https://www.google.com/maps/place/Stacja+naprawy+rower%C3%B3w/@51.9557411,15.4902315,15.62z/data=!4m10!1m2!2m1!1sStacja+naprawy+rower%C3%B3w!3m6!1s0x47061387afe62faf:0x9f3d1b469b452e2f!8m2!3d51.9563055!4d15.4970451!15sChdTdGFjamEgbmFwcmF3eSByb3dlcsOzd5IBE2JpY3ljbGVfcmVwYWlyX3Nob3DgAQA!16s%2Fg%2F11kqzwb2j3?hl=pl-PL&entry=ttu
       xml:
         name: autorepair
+    Map:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6623c9f246efe62da1750cd3
+        TrackName: 
+          type: string
+          example: Trasa
+        Creator: 
+          type: string
+          example: example@gmail.com
+        Pictures:
+          type: array
+          items: 
+            type: string
+            example: /path/to/file 
+        RoutePoints:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+            maxItems: 2
+            example: 51.0004,19.5555
+        Distance:
+          type: number
+          example: 35444.45
+        negElevation:
+          type: number
+          example: 344
+        posElevation:
+          type: number
+          example: 200
+        verified:
+          type: boolean
+          example: false
+        intresting:
+          type: boolean
+          example: false
+      xml:
+        name: map
+    Service:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6623c9f246efe62da1750cd3
+        name: 
+          type: string
+          example: Serwis rowerowy
+        address: 
+          type: string
+          example: Stefana Batorego 122, 65-735 Zielona Góra
+        internet_page:
+          type: string
+          example: https://rowerek.pl/Serwis-rowerowy-cinfo-pol-31.html
+        phone_number: 
+          type: string
+          example: 796935555
+        latitude:
+          type: string
+          example: 51.956546957030895
+        longitude:
+          type: string
+          example: 15.496965817127784
+        google_link:
+          type: string
+          example: https://www.google.com/maps/place/Stacja+naprawy+rower%C3%B3w/@51.9557411,15.4902315,15.62z/data=!4m10!1m2!2m1!1sStacja+naprawy+rower%C3%B3w!3m6!1s0x47061387afe62faf:0x9f3d1b469b452e2f!8m2!3d51.9563055!4d15.4970451!15sChdTdGFjamEgbmFwcmF3eSByb3dlcsOzd5IBE2JpY3ljbGVfcmVwYWlyX3Nob3DgAQA!16s%2Fg%2F11kqzwb2j3?hl=pl-PL&entry=ttu
+      xml: service 

@@ -4,7 +4,7 @@ export const services = Router();
 
 services.get('/',async (req,res)=>{
    const data = await getServices();
-   res.send(data);
+   res.status(200).send(data);
 })
 
 

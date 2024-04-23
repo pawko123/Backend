@@ -8,7 +8,9 @@ const mapschema =new mongoose.Schema({
         ,required:true},
     Distance:{type:Number,required:true},
     negElevation:{type:Number,required:true},
-    posElevation:{type:Number,required:true}
+    posElevation:{type:Number,required:true},
+    verified:{type:Boolean,required:true,default:false},
+    instresting:{type:Boolean,required:true,default:false}
 });
 
 export const Map = mongoose.model("Map",mapschema);

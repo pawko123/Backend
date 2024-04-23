@@ -4,7 +4,7 @@ export const autorepair = Router();
 
 autorepair.get('/',async (req,res)=>{
    const data = await getAutoRepair();
-   res.send(data);
+   res.status(200).send(data);
 })
 
 

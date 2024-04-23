@@ -53,7 +53,9 @@ maps.post('/',isTrackNamevalid,upload.fields([{name:"plikGPX"},{name:'pictures',
             RoutePoints: data.coordinates.map(coordinate => [coordinate.latitude, coordinate.longitude]),
             Distance:data.distance,
             negElevation:data.negElevation,
-            posElevation:data.posElevation
+            posElevation:data.posElevation,
+            verified:false,
+            intresting:false
          });
         return res.status(200).json(map).end()
     }
