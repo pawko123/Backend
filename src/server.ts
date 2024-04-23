@@ -16,6 +16,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.json());
 app.use(cors())
 app.use('/',router());
+app.use(express.static('../Backend'))
 
 app.get('/', (req:Request, res:Response) => {
   res.send('GET request to the homepage')

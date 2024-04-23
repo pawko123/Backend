@@ -1,8 +1,10 @@
 import { Router,Request,Response,NextFunction } from 'express';
-import { createMap, getMapbyName, getUsersMap } from '../models/map.model';
+import { MapType, createMap, getMapbyName, getUsersMap } from '../models/map.model';
 import upload from '../config/mapmulterconfig';
 import { extractgpxdata, gpxData } from '../scripts/gpxparse';
 import fs from 'fs'
+import 'dotenv/config'
+
 export const maps = Router();
 
 async function isTrackNamevalid(req:Request,res:Response,next:NextFunction) {
@@ -19,7 +21,7 @@ async function isTrackNamevalid(req:Request,res:Response,next:NextFunction) {
 maps.get('/:email',async(req,res)=>{
     try{
         const email = req.params.email;
-        const data = await getUsersMap(email)
+        const data:MapType[]= (await getUsersMap(email)).map(map=>map.toObject())
         res.status(200).json(data).end()
     }catch(err){
         console.log(err)
@@ -27,8 +29,7 @@ maps.get('/:email',async(req,res)=>{
     }
 })
 
-
-maps.post('/',isTrackNamevalid,upload.fields([{name:"plikGPX"},{name:'pictures',maxCount:5}]),async(req,res) =>{
+maps.post('/',isTrackNamevalid,upload.fields([{name:"plikGPX"},{name:'pictures',maxCount:5}]),async(req:Request,res:Response,next:NextFunction) =>{
     try{
         //@ts-ignore
         const data:gpxData=extractgpxdata(req.files['plikGPX'][0].path)

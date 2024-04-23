@@ -1,5 +1,15 @@
 import mongoose from "mongoose";
-
+export interface MapType {
+    TrackName: string;
+    Creator: string;
+    Pictures?: string[];
+    RoutePoints: number[][]; // 2D array of numbers
+    Distance: number;
+    negElevation: number;
+    posElevation: number;
+    verified: boolean;
+    instresting: boolean;
+}
 const mapschema =new mongoose.Schema({
     TrackName:{type: String,required: true},
     Creator:{type:String,required:true},
