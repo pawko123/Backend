@@ -13,7 +13,8 @@ const yamlfile  = fs.readFileSync('documentation.yaml', 'utf8')
 const swaggerDocument = YAML.parse(yamlfile)
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use(express.json());
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
 app.use(cors())
 app.use('/',router());
 app.use(express.static('../Backend'))
