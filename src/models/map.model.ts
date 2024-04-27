@@ -27,4 +27,10 @@ export const Map = mongoose.model("Map",mapschema);
 export const getMap = () => Map.find(); 
 export const getMapbyName = (name:String) => Map.find({TrackName:name})
 export const getUsersMap = (email:String) => Map.find({Creator:email})
+export const getMapbyId = (id:string) => Map.findById(id)
+export const getVerifiedMaps = () => Map.find({verified:true})
+export const getUnverifiedMaps = () => Map.find({verified:false})
+export const getInterestingMaps = () => Map.find({instresting:true})
 export const createMap = (values:Record<string,any>) => new Map(values).save().then((map)=>map.toObject())
+export const verifyMap = (id:string) => Map.findByIdAndUpdate(id,{verified:true})
+export const deleteMapbyId = (id:string) => Map.findByIdAndDelete(id)

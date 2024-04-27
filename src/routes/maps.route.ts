@@ -1,5 +1,5 @@
-import { Router,Request,Response,NextFunction } from 'express';
-import { MapType, createMap, getMapbyName, getUsersMap } from '../models/map.model';
+import { Router,Request,Response} from 'express';
+import { MapType, createMap, getMapbyName, getUsersMap, getMapbyId, getUnverifiedMaps, deleteMapbyId, verifyMap, getVerifiedMaps, getInterestingMaps} from '../models/map.model';
 import upload from '../config/mapmulterconfig';
 import { extractgpxdata, gpxData } from '../scripts/gpxparse';
 import fs from 'fs'
@@ -16,12 +16,117 @@ async function isTrackNamevalid(trackname:String):Promise<boolean> {
     }
 }
 
+maps.get('/verifiedmaps',async(req,res)=> {
+    try{
+        const data:MapType[]= (await getVerifiedMaps()).map(map=>map.toObject())
+        res.status(200).json(data).end()
+    }catch(err){
+        console.log(err)
+        return res.sendStatus(400)
+    }
+})
 
-maps.get('/:email',async(req,res)=>{
+maps.get('/intrestingmaps',async(req,res)=> {
+    try{
+        const data:MapType[]= (await getInterestingMaps()).map(map=>map.toObject())
+        res.status(200).json(data).end()
+    }catch(err){
+        console.log(err)
+        return res.sendStatus(400)
+    }
+})
+
+maps.get('/getmapbyid/:id',async(req,res)=> {
+    try{
+        const id = req.params.id;
+        const map = await getMapbyId(id);
+        if (map) {
+            return res.status(200).json(map).end()
+        }
+        return res.sendStatus(404)
+    }catch(err){
+        console.log(err)
+        return res.sendStatus(400)
+    }
+})
+
+maps.get('/getusersmaps/:email',async(req,res)=>{
     try{
         const email = req.params.email;
         const data:MapType[]= (await getUsersMap(email)).map(map=>map.toObject())
         res.status(200).json(data).end()
+    }catch(err){
+        console.log(err)
+        return res.sendStatus(400)
+    }
+})
+
+maps.put('/toggleInteresting/:id',async(req:Request,res:Response)=>{
+    
+    const id = req.params.id;
+    try{
+        const map = await getMapbyId(id);
+        if (map) {
+            map.instresting = !map.instresting;
+            map.save();
+        }
+        return res.sendStatus(200)
+    }catch(err){
+        console.log(err)
+        return res.sendStatus(400)
+    }
+})
+
+maps.get('/unverifiedmaps',async(req,res)=>{
+    try{
+        const data:MapType[]= (await getUnverifiedMaps()).map(map=>map.toObject())
+        res.status(200).json(data).end()
+    }catch(err){
+        console.log(err)
+        return res.sendStatus(400)
+    }
+})
+
+maps.delete('/deletemap/:id',async(req,res)=>{
+    try{
+        const id = req.params.id;
+        await deleteMapbyId(id)
+        return res.sendStatus(200)
+    }catch(err){
+        console.log(err)
+        return res.sendStatus(400)
+    }
+})
+
+maps.put('/verifymap/:id',async(req,res)=>{
+    try{
+        const id = req.params.id;
+        await verifyMap(id)
+        return res.sendStatus(200)
+    }catch(err){
+        console.log(err)
+        return res.sendStatus(400)
+    }
+})
+
+maps.put('/addpictures/:id',upload.fields([{name:'zdjecia',maxCount:5}]),async(req,res)=>{
+    try{
+        const id = req.params.id;
+        console.log(req.body)
+        var picturesPaths:string[]=[]
+        //@ts-ignore
+        if(req.files['zdjecia'] && typeof req.files['zdjecia'] !== 'undefined'){
+            //@ts-ignore
+            picturesPaths = req.files['zdjecia'].map((file: any) => file.path);
+        }
+        const map = await getMapbyId(id);
+        if (map) {
+            picturesPaths.forEach(picturePath => {
+                map.Pictures!.push(picturePath);
+            });
+            map.save();
+        }
+        return res.status(200).json({message:"Zdjęcia zostały dodane pomyslnie"}).end()
     }catch(err){
         console.log(err)
         return res.sendStatus(400)
