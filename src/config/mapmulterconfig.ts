@@ -12,7 +12,7 @@ async function createDir(dir: any) {
     }
 }
 
-const storage = multer.diskStorage({
+const trackstorage = multer.diskStorage({
     destination: async function(req, file, cb) {
         const trackName = req.body.TrackName;
         const baseDir = `trackpictures/${trackName}`;
@@ -24,5 +24,16 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage: storage });
-export default upload
+const eventstorage = multer.diskStorage({
+    destination: async function(req, file, cb) {
+        const baseDir = `eventpictures/`;
+        await createDir(baseDir);
+        cb(null, baseDir);
+    },
+    filename: function(req, file, cb) {
+        cb(null, path.basename(file.originalname) + Date.now() + path.extname(file.originalname));
+    }
+});
+
+export const trackupload = multer({ storage: trackstorage });
+export const eventupload = multer({ storage: eventstorage });

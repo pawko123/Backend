@@ -16,6 +16,8 @@ tags:
     description: Serwisy Rowerowe
   - name: Autorepairs
     description: Punkty Samoobslugi
+  - name: Events
+    description: Wydarzenia rowerowe
 paths:
   /autorepair:
     get:
@@ -115,7 +117,7 @@ paths:
                 $ref: '#/components/schemas/Service'
         '400':
           description: Invalid input
-  /maps/{email}:
+  /maps/getusersmaps/{email}:
     get:
       tags:
         - Maps
@@ -141,6 +143,368 @@ paths:
                 $ref: '#/components/schemas/Map'
         '400':
           description: Invalid email supplied
+  /maps/verifiedmaps:
+    get:
+      tags:
+        - Maps
+      summary: Get verified maps
+      responses:
+        '200':
+          description: An array of verified maps
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Map'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Map'
+        '400':
+          description: Bad request
+  /maps/intrestingmaps:
+    get:
+      tags:
+        - Maps
+      summary: Get interesting maps
+      responses:
+        '200':
+          description: An array of interesting maps
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Map'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Map'
+        '400':
+          description: Bad request
+  /maps/getmapbyid/{id}:
+    get:
+      tags:
+        - Maps
+      summary: Get a map by its ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: A map object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Map'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Map'
+        '400':
+          description: Bad request
+        '404':
+          description: Map not found
+  /maps/toggleInteresting/{id}:
+    put:
+      tags:
+        - Maps
+      summary: Toggle the interesting status of a map
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successfully toggled the interesting status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Map'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Map'
+        '400':
+          description: Bad request
+  /maps/unverifiedmaps:
+    get:
+      tags:
+        - Maps
+      summary: Get unverified maps
+      responses:
+        '200':
+          description: An array of unverified maps
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Map'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Map'
+        '400':
+          description: Bad request
+  /maps/deletemap/{id}:
+    delete:
+      tags:
+        - Maps
+      summary: Delete a map by its ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successfully deleted the map
+        '400':
+          description: Bad request
+  /maps/verifymap/{id}:
+    put:
+      tags:
+        - Maps
+      summary: Verify a map by its ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successfully verified the map
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Map'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Map'
+        '400':
+          description: Bad request
+  /maps/addpictures/{id}:
+    put:
+      tags:
+        - Maps
+      summary: Add pictures to a map by its ID
+      consumes:
+      - multipart/form-data
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - in: formData
+          name: zdjecia
+          type: array
+          items:
+            type: string
+            format: binary
+          required: true
+          description: The pictures to upload.
+      responses:
+        '200':
+          description: Successfully added the pictures
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+            application/xml:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Bad request
+  /maps/uploadmap:
+    post:
+      tags:
+        - Maps
+      summary: Upload a GPX file and up to 5 pictures for a map, and create a new map if the track name is valid
+      consumes:
+      - multipart/form-data
+    parameters:
+      - in: formData
+        name: plikGPX
+        type: file
+        required: true
+        description: The GPX file to upload.
+      - in: formData
+        name: pictures
+        type: array
+        required: false
+        description: Up to 5 pictures to upload.
+        items:
+          type: string
+          format: binary
+        maxItems: 5
+      - in: formData
+        name: TrackName
+        type: string
+        required: true
+        description: The name of the track.
+      - in: formData
+        name: Creator
+        type: string
+        required: true
+        description: The creator of the map.
+    responses:
+      '200':
+        description: Successfully created the map
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Map'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Map'
+      '400':
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      '409':
+        description: Conflict - a track with the same name already exists
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+  /maps/deletepicture/{id}/{picture}:
+    put:
+      tags:
+        - Maps
+      summary: Delete a specific picture from a map by its ID and picture name
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: The ID of the map
+        - name: picture
+          in: path
+          required: true
+          type: string
+          description: The name of the picture to delete
+      responses:
+        '200':
+          description: Successfully deleted the picture
+        '400':
+          description: Bad request
+  /maps/intrestingmapspage/{page}:
+    get:
+      tags:
+        - Maps
+      summary: Get a page (8 maps) of interesting maps
+      parameters:
+        - name: page
+          in: path
+          required: true
+          type: integer
+          description: The page number
+      responses:
+        '200':
+          description: Successfully retrieved the page of interesting maps
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Map'
+        '400':
+          description: Bad request
+  /maps/verifiedmapspage/{page}:
+    get:
+      tags:
+        - Maps
+      summary: Get a page (8 maps) of verified maps
+      parameters:
+        - name: page
+          in: path
+          required: true
+          type: integer
+          description: The page number
+      responses:
+        '200':
+          description: Successfully retrieved the page of verified maps
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Map'
+        '400':
+          description: Bad request
+  /Events:
+    get:
+      tags:
+        - Events
+      summary: Get events sorted by newest
+      responses:
+        '200':
+          description: A list of events
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Event'
+            application/xml:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Event'
+        '400':
+          description: Bad request
+    post:
+      tags:
+        - Events
+      summary: Create a new event
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Wielki Wyścig Rowerowy Zielona Góra 2024"
+                description:
+                  type: string
+                  example: "Zapraszamy wszystkich miłośników dwóch kółek do udziału w emocjonującym Wielkim Wyścigu Rowerowym Zielona Góra 2024!"
+                eventdate:
+                  type: string
+                  format: date
+                  example: "2024-04-18"
+                eventtime:
+                  type: string
+                  example: "16:00"
+                location:
+                  type: string
+                  example: "Zielona Góra"
+                picture:
+                  type: string
+                  format: binary
+                organizer:
+                  type: string
+                  example: "Organizator Wyścigu"
+      responses:
+        '200':
+          description: Event created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Event poprawnie stworzony"
+        '400':
+          description: Bad request
 components:
   schemas:
     Autorepair:
@@ -235,4 +599,32 @@ components:
         google_link:
           type: string
           example: https://www.google.com/maps/place/Stacja+naprawy+rower%C3%B3w/@51.9557411,15.4902315,15.62z/data=!4m10!1m2!2m1!1sStacja+naprawy+rower%C3%B3w!3m6!1s0x47061387afe62faf:0x9f3d1b469b452e2f!8m2!3d51.9563055!4d15.4970451!15sChdTdGFjamEgbmFwcmF3eSByb3dlcsOzd5IBE2JpY3ljbGVfcmVwYWlyX3Nob3DgAQA!16s%2Fg%2F11kqzwb2j3?hl=pl-PL&entry=ttu
-      xml: service 
+      xml: 
+        name: service 
+    Event:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "Wielki Wyścig Rowerowy Zielona Góra 2024"
+        description:
+          type: string
+          example: "Zapraszamy wszystkich miłośników dwóch kółek do udziału w emocjonującym Wielkim Wyścigu Rowerowym Zielona Góra 2024!"
+        eventdate:
+          type: string
+          format: date
+          example: "2024-04-18"
+        eventtime:
+          type: string
+          example: "16:00"
+        location:
+          type: string
+          example: "Zielona Góra"
+        image:
+          type: string
+          example: "event.jpg"
+        organizer:
+          type: string
+          example: "Organizator Wyścigu"
+      xml:
+        name: event

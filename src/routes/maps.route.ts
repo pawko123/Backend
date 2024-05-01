@@ -1,6 +1,6 @@
 import { Router,Request,Response} from 'express';
-import { MapType, createMap, getMapbyName, getUsersMap, getMapbyId, getUnverifiedMaps, deleteMapbyId, verifyMap, getVerifiedMaps, getInterestingMaps} from '../models/map.model';
-import upload from '../config/mapmulterconfig';
+import { MapType, createMap, getMapbyName, getUsersMap, getMapbyId, getUnverifiedMaps, deleteMapbyId, verifyMap, getVerifiedMaps, getInterestingMaps, getVerfiedMapsPage, getInterestingMapsPage} from '../models/map.model';
+import {trackupload} from '../config/mapmulterconfig';
 import { extractgpxdata, gpxData } from '../scripts/gpxparse';
 import fs from 'fs'
 import 'dotenv/config'
@@ -26,9 +26,31 @@ maps.get('/verifiedmaps',async(req,res)=> {
     }
 })
 
+maps.get('/verifiedmapspage/:page',async(req,res)=> {
+    try{
+        const page = parseInt(req.params.page)
+        const data:MapType[]= (await getVerfiedMapsPage(page)).map(map=>map.toObject())
+        res.status(200).json(data).end()
+    }catch(err){
+        console.log(err)
+        return res.sendStatus(400)
+    }
+})
+
 maps.get('/intrestingmaps',async(req,res)=> {
     try{
         const data:MapType[]= (await getInterestingMaps()).map(map=>map.toObject())
+        res.status(200).json(data).end()
+    }catch(err){
+        console.log(err)
+        return res.sendStatus(400)
+    }
+})
+
+maps.get('/intrestingmapspage/:page',async(req,res)=> {
+    try{
+        const page = parseInt(req.params.page)
+        const data:MapType[]= (await getInterestingMapsPage(page)).map(map=>map.toObject())
         res.status(200).json(data).end()
     }catch(err){
         console.log(err)
@@ -98,6 +120,29 @@ maps.delete('/deletemap/:id',async(req,res)=>{
     }
 })
 
+maps.put('/deletepicture/:id/:picture',async(req,res)=>{
+    try{
+        const id = req.params.id;
+        const picture = req.params.picture;
+        const map = await getMapbyId(id);
+        fs.unlink(picture, (err) => {
+            if (err) {
+            console.error('Błąd podczas usuwania pliku:', err);
+            return;
+            }
+            console.log('Plik został pomyślnie usunięty');
+        })
+        if (map) {
+            map.Pictures = map.Pictures!.filter(pic => pic !== picture);
+            map.save();
+        }
+        return res.sendStatus(200)
+    }catch(err){
+        console.log(err)
+        return res.sendStatus(400)
+    }
+})
+
 maps.put('/verifymap/:id',async(req,res)=>{
     try{
         const id = req.params.id;
@@ -109,7 +154,7 @@ maps.put('/verifymap/:id',async(req,res)=>{
     }
 })
 
-maps.put('/addpictures/:id',upload.fields([{name:'zdjecia',maxCount:5}]),async(req,res)=>{
+maps.put('/addpictures/:id',trackupload.fields([{name:'zdjecia',maxCount:5}]),async(req,res)=>{
     try{
         const id = req.params.id;
         console.log(req.body)
@@ -133,7 +178,7 @@ maps.put('/addpictures/:id',upload.fields([{name:'zdjecia',maxCount:5}]),async(r
     }
 })
 
-maps.post('/',upload.fields([{name:"plikGPX"},{name:'pictures',maxCount:5}]),async(req:Request,res:Response) =>{
+maps.post('/uploadmap',trackupload.fields([{name:"plikGPX"},{name:'pictures',maxCount:5}]),async(req:Request,res:Response) =>{
     const isnamevalid=await isTrackNamevalid(req.body.TrackName)
     if(isnamevalid){
         try{
@@ -167,8 +212,32 @@ maps.post('/',upload.fields([{name:"plikGPX"},{name:'pictures',maxCount:5}]),asy
             return res.status(200).json(map).end()
         }
         catch(err){
+            //@ts-ignore
+            fs.unlink(req.files['plikGPX'][0].path, (err) => {
+                if (err) {
+                console.error('Błąd podczas usuwania pliku:', err);
+                return;
+                }
+                console.log('Plik został pomyślnie usunięty');
+            });
+            //@ts-ignore
+            if(typeof req.files['pictures'] !== 'undefined'){
+                //@ts-ignore
+                const pictures = req.files['pictures'].map((file: any) => file);
+                //@ts-ignore
+                pictures.forEach(picture => {
+                    //@ts-ignore
+                    fs.unlink(picture.path, (err) => {
+                    if (err) {
+                    console.error('Błąd podczas usuwania pliku:', err);
+                    return;
+                    }
+                    console.log('Plik został pomyślnie usunięty');
+                });
+                });
+            }
             console.log(err)
-            return res.sendStatus(400)
+            return res.status(400).send({message:"Błąd podczas tworzenia trasy. Upewnij się, że plik GPX jest poprawny"})
         }
     }else{
         try{
@@ -196,10 +265,10 @@ maps.post('/',upload.fields([{name:"plikGPX"},{name:'pictures',maxCount:5}]),asy
                 });
                 });
             }
-            return res.send({message:"Trasa o podanej nazwie juz istnieje"})
+            return res.status(409).send({message:"Trasa o podanej nazwie juz istnieje"})
         }catch(err){
             console.log(err)
-            return res.sendStatus(400)
+            return res.sendStatus(400).send({message:"Błąd podczas tworzenia trasy."})
         }
     } 
 }
